@@ -306,30 +306,6 @@ int sys_open(void) {
   return fd;
 }
 
-int sys_prng(void) {
-    return prng();
-}
-
-int sys_nice(void) {
-    int pid;
-    int niceVal;
-    begin_op();
-    if(argint(0, &pid) < 0 || argint(1, &niceVal) < 0 || pid == -1 || niceVal == -1)
-    {
-        viewPriority();
-        end_op();
-        return 0;
-    }
-    else if (!(argint(0, &pid) < 0) || !(argint(1, &niceVal) < 0)){
-        int priority = niceVal + 20;
-        setPriority(pid, priority);
-        end_op();
-        return 0;
-    }
-    end_op();
-    return -1; 
-}
-
 int sys_mkdir(void) {
   char *path;
   struct inode *ip;
@@ -342,6 +318,58 @@ int sys_mkdir(void) {
   iunlockput(ip);
   end_op();
   return 0;
+}
+
+int sys_strace(void) {
+    int base_option;
+    // char* filename;    
+    char* userDump;
+    int eFlag = 0;
+    int oFlag = 0;
+    int cFlag = 0;
+    int sFlag = -1;
+    char *sysCallName;
+    char *sysFileName;
+    if(!(argint(0, &base_option) < 0) && base_option == 1)
+    {
+        setContinueTrace(1);
+    }
+    else if(!(argint(0, &base_option) < 0) && base_option == 2)
+    {
+        setContinueTrace(0);
+    }
+    else if(!(argint(0, &base_option) < 0) && base_option == 3)
+    {       
+        setRunTrace(1);
+    }
+    else if(!(argint(0, &base_option) < 0) && base_option == 4)
+    {
+        argint(1, &cFlag);
+        argint(2, &oFlag);
+        argstr(3, &sysFileName);
+        argint(4, &sFlag);
+        argint(5, &eFlag);
+        argstr(6, &sysCallName);
+
+        cprintf("\nstrace on\n");
+        cprintf(" Flag Status: cFlag %d eFlag: %d %s \t oFlag: %d %s \t sFlag: %d\n", cFlag, eFlag, sysCallName, oFlag, sysFileName, sFlag);
+
+        setRunTrace(1);
+        // int eFlagInp, int oFlagInp, int cFlagInp, int sFlagInp, char *sysCallNameInp, char *sysFileNameInp
+        updateTraceFlags(eFlag, oFlag, cFlag, sFlag, sysCallName, sysFileName);
+    }
+    else if(!(argint(0, &base_option) < 0) && base_option == 5)
+    {
+        printDump();
+    }
+    else if(!(argint(0, &base_option) < 0) && base_option == 6)
+    {
+        if(!(argstr(8, &userDump) < 0))
+        {
+            writeDumpToUserBuffer(userDump);
+        }
+    }
+    return 0;
 }
 
 int sys_mknod(void) {

@@ -18,6 +18,7 @@ void            bwrite(struct buf*);
 // console.c
 void            consoleinit(void);
 void            cprintf(char*, ...);
+void            sprintf(char*, char*, ...);
 void            consoleintr(int(*)(void));
 void            panic(char*) __attribute__((noreturn));
 
@@ -111,19 +112,13 @@ int             growproc(int);
 int             kill(int);
 void            pinit(void);
 void            procdump(void);
-void            scheduler(int) __attribute__((noreturn));
+void            scheduler(void) __attribute__((noreturn));
 void            sched(void);
 void            sleep(void*, struct spinlock*);
 void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
-int             setPriority(int, int);
-int             viewPriority(void);
-
-// prng.c
-int             prng(void);
-int             prng_limit(int);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
@@ -153,6 +148,13 @@ int             argstr(int, char**);
 int             fetchint(uint, int*);
 int             fetchstr(uint, char**);
 void            syscall(void);
+void            setContinueTrace(int);
+void            setRunTrace(int);
+int             runTrace();
+void            printDump();
+void            writeToFile(char*);
+void            writeDumpToUserBuffer(char*);
+void            updateTraceFlags(int , int , int , int , char*, char*);
 
 // timer.c
 void            timerinit(void);
